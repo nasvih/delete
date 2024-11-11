@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Heed n Heal</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--===============================================================================================-->	
+
+<!--===============================================================================================-->
+<link
+href="https://fonts.googleapis.com/css?family=Hind:400,700"
+rel="stylesheet"
+/>
+
+{% load static %}
+
+<link
+type="text/css"
+rel="stylesheet"
+href="{% static 'css/util.css' %}"
+/>
+
+<link
+type="text/css"
+rel="stylesheet"
+href="{% static 'css/main.css' %}"
+/>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<link rel="icon" type="image/x-icon" href="{% static 'images/logo.png' %">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+<!--===============================================================================================-->
+
+<style>
+	.nn{
+		border: 0cap;
+		color: #999999;
+	}
+</style>
+</head>
+<body>
+	{% if messages %}
+	{% if not messages_displayed %}
+	  <script>
+		var djangoMessages = [];
+		{% for message in messages %}
+		  djangoMessages.push("{{ message }}");
+		{% endfor %}
+		var djangoMessage = djangoMessages.join("\n");
+		alert(djangoMessage);
+		window.addEventListener('load', function() {
+		  setTimeout(function() {
+			location.reload();
+		  }, 0);
+		});
+	  </script>
+	  {% with messages_displayed=True %}
+		{% include "index.html" %}
+	  {% endwith %}
+	{% endif %}
+  {% endif %}
+	<div class="limiter">
+		<div class="container-login100">
+			<div class="wrap-login100">
+				<div class="login100-pic js-tilt" data-tilt>
+					<br><br><br><br><img src="{% static 'images/logo.png' %}" alt="IMG">
+				</div>
+
+				<form class="login100-form validate-form" id="bookingForm" method="post">
+				        {% csrf_token %}
+					<span class="login100-form-title">
+						<h2>Heed n Heal </h2>Book Your Token
+					
+					<span class="txt1">
+						<center><br>Near saidarpalli, J T road, Thalassery, Kerala 670102</center>
+					</span></span>
+					
+
+					<div class="wrap-input100 validate-input" data-validate = "Enter your full name">
+						
+						<input id="name" class="input100" name="patient_name" type="text" required autocomplete="patient_name" placeholder="Name"/>
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fa fa-user icon" aria-hidden="true"></i>
+						</span>
+					</div>
+
+					<div class="wrap-input100 validate-input" data-validate = "Valid mobile number is required">
+						
+						<input id="phone" class="input100" name="phone_no" type="tel" required autocomplete="phone_no" placeholder="Mobile Number"/>
+
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fa fa-mobile" aria-hidden="true"></i>
+						</span>
+					</div>
+
+
+
+					<div class="wrap-input100 validate-input" data-validate = "Enter upcoming date">
+					
+						<input id="date" class="input100 nn" name="available_date" type="date" required autocomplete="available_date" placeholder="Date"/>
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fa fa-calendar-alt icon" aria-hidden="true"></i>
+						</span>
+					</div>
+
+					<div class="wrap-input100 validate-input" data-validate = "Select your doctor">
+						<select id="doctor" class="input100 nn" name="doctor_id" required autocomplete="doctor_id">
+                        	<option value="" disabled selected>Select Doctor</option>
+						</select>
+						
+							
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fa fa-user-md icon" aria-hidden="true"></i>
+						</span>
+					</div>
+
+
+
+					<div class="wrap-input100 validate-input" data-validate = "Select your timing">
+						<select id="time" class="input100 nn" name="available_time" required autocomplete="available_time">
+						</select>
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fa fa-clock icon" aria-hidden="true"></i>
+						</span>
+					</div>
+
+					<div class="wrap-input100 validate-input" data-validate = "Select your token">
+						<select id="token" class="input100 nn" name="token_no" required autocomplete="token_no">
+                        </select>
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fa fa-ticket-alt icon" aria-hidden="true"></i>
+						</span>
+					</div>
+					
+					<div class="container-login100-form-btn">
+						<button type="submit" class="login100-form-btn">
+							Book Token
+						</button>
+					</div>
+					<div class="text-center p-t-136">
+						<span class="txt1">
+							Go to
+						</span>
+						<a class="txt2" href="https://heednheal.com/">
+							heednheal.com
+						</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+      document.getElementById('date').addEventListener('change', function() {
+          var date = document.getElementById('date').value;
+          $.ajax({
+              url: '/doctor_list/',
+              type: 'post',
+              data: {
+                  'date': date,
+                  csrfmiddlewaretoken: '{{ csrf_token }}'
+              },
+              success: function(data) {
+                  $('#doctor').empty();
+                  $('#time').empty();
+                  $('#doctor').append($('<option>', {
+                      value: '',
+                      text: 'Select Doctor'
+                  }));
+                  if (data.doctors && data.doctors.length > 0) {
+                      $.each(data.doctors, function(index, doctor) {
+                          $('#doctor').append($('<option>', {
+                              value: doctor.doctor_id,
+                              text: doctor.name + '-' + doctor.department
+                          }));
+                      });
+                  } else {
+                      $('#doctor').append($('<option>', {
+                          value: '',
+                          text: 'No doctors available'
+                      }));
+                  }
+              },
+              error: function(xhr, status, error) {
+                  console.error(xhr.responseText);
+              }
+          });
+      });
+  });
+
+  document.getElementById('doctor').addEventListener('change', function() {
+    var doctorSelect = this;
+    var selectedDoctor = doctorSelect.options[doctorSelect.selectedIndex].value;
+    var date = document.getElementById('date').value;
+    $.ajax({
+        url: '/fetch_time_list/',
+        type: 'post',
+        data: {
+            'doctor_id': selectedDoctor,
+            'date': date,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(response) {
+          // Clear previous time options
+          $('#time').empty();
+          $('#token').empty(); 
+          // Extracting data from JSON response
+          
+          var data = response;
+          
+          $('#time').append($('<option>', {
+            value: '',
+            text: "Select Time Slot"
+          }));
+          if (data == "not selected") {
+            $('#time').append($('<option>', {
+              value: null,
+              text: "Please select a doctor first"
+          }));
+          }
+          else if (data.data) {
+            $.each(data.data, function(index, data) {
+              $('#time').append($('<option>', {
+                  value: data.doctor_time,
+                  text: data.doctor_time
+              }));
+            });
+          } 
+          else {
+              $('#time').append($('<option> ', {
+                  value: '',
+                  text: 'No time slots available'
+              }));
+          }
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+        }
+    });
+});
+
+document.getElementById('time').addEventListener('change', function() {
+  var timeSelect = this;
+  var selectedTime = timeSelect.options[timeSelect.selectedIndex].value;
+  var date = document.getElementById('date').value;
+  var doctor = document.getElementById('doctor').value;
+  $.ajax({
+      url: '/fetch_slot_list/',
+      type: 'post',
+      data: {
+          'doctor_id': doctor,
+          'date': date,
+          'time': selectedTime,
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(response) {
+        // Clear previous time options
+        $('#token').empty(); 
+        // Extracting data from JSON response
+        
+        var slots = response.slots
+
+        $('#token').append($('<option>', {
+          value: '',
+          text: "Select Token No"
+        }));
+        if (slots != 0) {
+          $.each(slots, function(index, slots) {
+            $('#token').append($('<option>', {
+                value: slots,
+                text: slots
+            }));
+          });
+        } 
+        else {
+          $('#token').append($('<option>', {
+            value: '',
+            text: "No tokens available",
+            disabled: true
+          }));
+        }
+      },
+      error: function(xhr, status, error) {
+          console.error(xhr.responseText);
+      }
+  });
+});
+
+</script>
+	
+
+	
+<!--===============================================================================================-->	
+	<script src="{% static 'vendor/jquery/jquery-3.2.1.min.js' %}"></script>
+<!--===============================================================================================-->
+	<script src="{% static 'vendor/bootstrap/js/popper.js' %}"></script>
+	<script src="{% static 'vendor/bootstrap/js/bootstrap.min.js' %}"></script>
+<!--===============================================================================================-->
+	<script src="{% static 'vendor/select2/select2.min.js' %}"></script>
+<!--===============================================================================================-->
+	<script src="{% static 'vendor/tilt/tilt.jquery.min.js' %}"></script>
+	<script >
+		$('.js-tilt').tilt({
+			scale: 1.1
+		})
+	</script>
+<!--===============================================================================================-->
+	<script src="{% static 'js/main.js' %}"></script>
+
+</body>
+</html>
